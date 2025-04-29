@@ -1,0 +1,47 @@
+<div class="card-wr">
+    <div >
+        <button class="lo" onclick="show_current_dish('{{code}}')">
+            <div class='card-box'>
+                <div class='card-cont'>
+                    <div class='card-name'>{{describe_dish[code][0]}}</div>
+                    <div class='card-price'>{{price[code]}} грн.
+
+                            {% if add_pop == "pop" %}
+                        <img class='d_icon' src="/static/images/love.jpg">
+                            {% endif %}
+
+                            {% if add_rec == "rec" %}
+                        <img class='d_icon' src="/static/images/star.svg">
+                            {% endif %}
+
+                        <img class='d_iconLM' src="/static/images/likeW.jpg"><span class="num_like_menu"> {{describe_dish[code][3]}}</span>
+                    </div>
+
+                    <div class='card-descr'>{{describe_dish[code][1]}}</div>
+                </div>
+                <img class="imgcard"  src="/{{describe_dish[code][2]}}" alt="">
+            </div>
+        </button>
+  </div>
+    <select class="amount" name="select_amount"  id="{{code}}{{add_id}}" onchange="choiceOfDish(this.value, '{{code}}')">
+        <option disabled selected>Замовити</option>
+                {% for v in range(1,12)%}
+            <option value='{{v}}'>{{v}} порц.</option>
+                {% endfor %}
+    </select>
+                {% if code in addit: %}
+        <div>
+            <div style="font-size:12px; font-style: italic;">Додати: </div>
+            <nav class="nav-scroller__items nav-scrol-add dragscroll">
+
+                    {%for addition in menu_add[code]%}
+            <button class="nav-scr-add {{'add_ch_' + code}}" id='{{addition}}{{add_id}}' onclick="add_add(id, '{{code}}', '{{describe_dish[code][0]}}')">
+                <div class='card-name-add'>{{menu_add_ua[code][addition]}}</div>
+                <div class='card-price-add'>{{menu_add[code][addition]}} грн.</div>
+            </button>
+                    {%endfor%}
+            </nav>
+        </div>
+                {% endif %}
+
+</div>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{title}}</title>
+    <link href="/static/css/cafe_web.css" rel="stylesheet">
+    <script type="text/javascript" src="/static/js/bootstrap.bundle.min.js"></script>
+    <script defer src="/static/js/dragscroll.js"></script>
+    <script type="text/javascript" src="/static/js/cafe_web.js"></script>
+</head>
+
+<body style="margin: 0;">
+
+<div class='header1'>
+    <a href="/"><img id='logo' src="/static/images/cafe1.png" alt="Cafe"></a>
+
+        {% block top_menu %}
+
+        {% endblock %}
+</div>
+
+
+        {% block top_1 %}
+
+<div id="base">
+    <p> This is a home page</p>
+</div>
+        {% endblock %}
+
+
+</body>
+</html>
