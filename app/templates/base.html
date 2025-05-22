@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{title}}</title>
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+
+
+{% block extra_css_js %}
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+{% endblock %}
+
+</head>
+<body>
+
+    {% block top_menu %}
+        <a href="/"><img id="logo" src="{{ url_for('static', filename='images/cafe.png') }}" alt="Cafe"></a>
+    {% endblock %}
+
+
+    {% block menu %} {% endblock %}
+
+
+    {% block content %}
+        <div id="base">
+            <p> This is a home page</p>
+        </div>
+    {% endblock %}
+
+
+<div class="footer">
+     {% block footer %} {% endblock %}
+</div>
+
+</body>
+</html>

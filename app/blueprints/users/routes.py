@@ -1,144 +1,141 @@
-from flask import Blueprint, render_template, request, make_response, flash, redirect
+from flask import Blueprint, render_template, request, make_response, flash, abort, jsonify
 
-from .models import Users, Dishes, Orders, Comments
-from app.extensions import db, cache
+from .models import User, Dish, Order, Comment
+from app.extensions import cache, logger, safe_commit
 from .context import read_context
+from config import carousel_img, contacts, working_days, opening_hours
+from app.forms import CommentForm
+
 
 users_bp = Blueprint('users', __name__, template_folder='templates')
-
-
-def create_new_user() -> int:
-    last_user = db.session.query(Users).order_by(Users.id.desc()).first()
-    new_user_id = last_user.user_id + 1 if last_user else 1
-    new_user = Users(user_id=new_user_id)
-    db.session.add(new_user)
-    db.session.commit()
-
-    return new_user_id
 
 
 @users_bp.route('/')
 @cache.cached(timeout=600)
 def index():
     title = "Кафе"
-    comments_to_template = [(c.user_name, c.comment_date_time, c.comment_text) for c in Comments.query]
+    try:
+        comments = Comment.query.order_by(Comment.comment_date_time.desc()).limit(10).all()
+        comments_to_template = [(c.user_name, c.comment_date_time, c.comment_text) for c in comments]
+    except Exception as e:
+        logger.error("Comment query failed: %s", e, exc_info=True)
+        comments_to_template = []
 
-    return render_template('cafe_web.html', title=title, comments=comments_to_template)
+    return render_template(
+        'home.html',
+        title=title,
+        carousel_img=carousel_img,
+        comments=comments_to_template,
+        contacts=contacts,
+        working_days=working_days,
+        opening_hours=opening_hours
+    )
 
 
 @users_bp.route('/choice-dish/')
-@cache.cached(timeout=3600)
+@cache.cached(timeout=3600, unless=lambda: not request.cookies.get('user_id'))
 def choice_of_dishes():
     title = "Вибір замовлення"
     context = read_context()
     user_id = request.cookies.get('user_id')
+    html = render_template('choice_dish.html', title=title, **context)
     if not user_id:
-        new_user_id = str(create_new_user())
-        response = make_response(
-            render_template('choice_dish.html', title=title, **context))
+        new_user_id = str(User.create_new_user())
+        response = make_response(html)
         response.set_cookie('user_id', new_user_id, max_age=60 * 60 * 24 * 365)
         return response
 
-    return render_template('choice_dish.html', title=title, **context)
+    return html
 
 
 @users_bp.route('/dish/<dish_code>')
 def display_dish(dish_code: str):
     title = "Опис страви"
-    selected_dish = Dishes.query.filter_by(dish_code=dish_code).first()
-    selected_dish.views += 1
-    db.session.commit()
+    dish = Dish.query.filter(Dish.dish_code == dish_code).first()
 
-    return render_template('dish_describe.html', title=title, id=selected_dish.id, describe=selected_dish.describe,
-                           img=selected_dish.image_link, likes=selected_dish.likes, views=selected_dish.views)
+    if dish is None:
+        abort(404)
+
+    dish.views += 1
+    if not safe_commit():
+        logger.error("Could not update dish views.")
+
+    return render_template(
+        'dish_description.html',
+        title=title,
+        id=dish.id,
+        describe=dish.describe,
+        image_path=dish.image_link,
+        likes=dish.likes,
+        views=dish.views
+    )
 
 
 @users_bp.route('/post-order', methods=['POST'])
 def get_order_from_client():
-    if request.method == "POST":
+    try:
+        order = request.get_json()
+        if not order:
+            raise ValueError("No order data received")
+
+        user_id_cookie = request.cookies.get('user_id')
         try:
-            order = request.get_json()
-            if 'fish' in order:
-                wait = '35'
-            elif 'soup' in order or 'steak' in order:
-                wait = '25'
-            else:
-                wait = '15'
-            user_id = int(request.cookies.get('user_id'))
-            order_sum = int(order.pop('sum'))
-            table_num = order.pop('table_number')
-            if not user_id:
-                print('user not found')
-                user_id = 0
+            user_id = int(user_id_cookie)
+        except (TypeError, ValueError):
+            logger.warning("Invalid or missing user_id cookie")
+            user_id = 0
 
-            add_order = Orders(
-                user_id=user_id,
-                table_number=table_num,
-                order_sum=order_sum,
-                order=order
-            )
-            db.session.add(add_order)
+        order_sum = int(order.pop('sum', 0))
+        table_num = order.pop('table_number', 0)
 
-            update_user_stat = Users.query.filter_by(user_id=user_id).first()
-            update_user_stat.sessions += 1
-            update_user_stat.total_sum += order_sum
+        Order.add_order(user_id, table_num, order_sum, order)
 
-            db.session.commit()
-            resp = make_response(render_template('finish.html'))
-            resp.set_cookie('order', 'ok', max_age=10)
-            resp.set_cookie('wait', wait, max_age=10)
+        User.update(user_id, order_sum)
 
-        except Exception as e:
-            flash(f"{e}")
-            resp = make_response(render_template('finish.html'))
-            resp.set_cookie('order', 'trouble')
-        return resp
+        return jsonify({"processed": True}), 200
 
-    return render_template('cafe_web.html')
+    except Exception as e:
+        logger.error("Order not processed: %s", e, exc_info=True)
+        return jsonify({"processed": False}), 400
 
 
 @users_bp.route('/post-order-like', methods=['POST'])
 def post_order_like():
-    if request.method == "POST":
-        like_id = request.get_json()
-        add_like = Dishes.query.filter_by(id=like_id).first()
-        add_like.likes += 1
-        db.session.commit()
+    try:
+        data = request.get_json()
+        like_id = data.get("like_id")
+        if not like_id:
+            raise ValueError("Missing like_id in request")
 
-    return render_template('cafe_web.html')
+        Dish.query.filter_by(id=like_id).update({Dish.likes: Dish.likes + 1})
+        if not safe_commit():
+            logger.error("Could not update dish views.")
+
+        return jsonify({"success": True}), 200
+
+    except Exception as e:
+        logger.error("Like update error: %s", e, exc_info=True)
+        return jsonify({"success": False}), 400
 
 
-@users_bp.route("/upload-comment", methods=['POST'])
+@users_bp.route("/upload-comment", methods=['GET', 'POST'])
 def upload_comment():
-    user_id = int(request.cookies.get('user_id'))
-    if request.method == "POST":
-        comm_name = request.form['comm_name']
-        comm_text = request.form['comm_text']
-        comment = Comments(
-            user_id=user_id,
-            user_name=comm_name,
-            comment_text=comm_text
-        )
-        db.session.add(comment)
-        db.session.commit()
+    form = CommentForm()
+    if form.validate_on_submit():
+        user_id_raw = request.cookies.get('user_id')
+        if not user_id_raw or not user_id_raw.isdigit():
+            flash("Ви не зареєстровані, можливо, у вашому браузері блокуються cookie", "error")
+            return render_template("faulty.html")
 
-    return redirect('/')
+        user_id = int(user_id_raw)
+        Comment.add_comment(user_id, form.comm_name.data, form.comm_text.data)
+        flash("Дякуємо за ваш комент! Він з'явиться після модерації.", "success")
+        return render_template("gratitude.html")
+
+    return render_template("upload_comment.html", form=form)
 
 
-@users_bp.route('/finish')
-def finish_ok():
-    title = "Замовлення"
-    message_ok = ''
-    m_d = ''
-    wait = ''
-    message_fault = ''
-    success_order = request.cookies.get('order')
-    if success_order == 'ok':
-        wait = request.cookies.get('wait')
-        message_ok = f'Дякуємо. Ваше замовлення прийняте і буде готове через - {wait} хвилин.'
-        m_d = '(Час виконання замовлення розраховується автоматично відповідно до вибраних вами страв)'
-    else:
-        message_fault = 'При відправленні замовлення сталася помилка (.'
+@users_bp.route('/faulty')
+def faulty():
+    return render_template('faulty.html')
 
-    return render_template('finish.html', title=title, message_ok=message_ok, m_d=m_d, message_fault=message_fault,
-                           wait=wait)

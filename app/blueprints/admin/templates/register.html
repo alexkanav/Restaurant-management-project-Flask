@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+
+{% block top_menu %}
+    <div class='header'>
+
+        {{ super() }}
+
+        <div class="top-nav-menu">
+            <a class="menu-link" href="{{ url_for('admin.admin_dashboard') }}">Головна</a>
+            <a class="menu-link" href="{{ url_for('admin.login') }}">Увійти</a>
+            <a class="menu-link" href="{{ url_for('admin.logout') }}">Вийти</a>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block content %}
+    <div class="container">
+        <h3 class="title">Реєстрація</h3>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-danger">{{message}}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+            {{ form.hidden_tag() }}
+
+            <p>
+                {{ form.username.label }}<br>
+                {{ form.username(size=32) }}<br>
+                {% for error in form.username.errors %}
+                    <span class="error">{{ error }}</span>
+                {% endfor %}
+            </p>
+
+            <p>
+                {{ form.email.label }}<br>
+                {{ form.email(size=32) }}<br>
+                {% for error in form.email.errors %}
+                    <span class="error">{{ error }}</span>
+                {% endfor %}
+            </p>
+
+            <p>
+                {{ form.password.label }}<br>
+                {{ form.password(size=32) }}<br>
+                {% for error in form.password.errors %}
+                    <span class="error">{{ error }}</span>
+                {% endfor %}
+            </p>
+
+            <p>
+                {{ form.confirm_password.label }}<br>
+                {{ form.confirm_password(size=32) }}<br>
+                {% for error in form.confirm_password.errors %}
+                    <span class="error">{{ error }}</span>
+                {% endfor %}
+            </p>
+
+            <p>{{ form.submit() }}</p>
+        </form>
+    </div>
+{% endblock %}

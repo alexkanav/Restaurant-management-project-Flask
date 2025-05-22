@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+
+{% block top_menu %}
+    <div class='header'>
+
+        {% include "logo.html" %}
+
+        {% include "links.html" %}
+
+        <div class="top-nav-menu">
+            <a class="menu-link" href="/"><img class="logo-menu" src="static/images/home.svg">На головну</a>
+            <a class="menu-link" href="choice-dish"><img class="logo-menu" src="static/images/hot.svg">Меню</a>
+        </div>
+
+    </div>
+{% endblock %}
+
+
+{% block content %}
+    <div class="container">
+        <div class="fault-message">
+            <h5>Помилка при обробці замовлення!!!!</h5>
+            <hr>
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-danger">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+        </div>
+    </div>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,21 +1,21 @@
-from app.blueprints.admin.models import Prices,Categories
-from app.blueprints.users.models import Dishes
-from config import table_numbers, addit, menu_add, menu_add_ua
+from app.blueprints.admin.models import Price, Category
+from app.blueprints.users.models import Dish
+from config import table_numbers, menu_add, menu_add_ua, category_icons
 
 
 def read_context() -> dict:
-    price = Prices.query.first().price
-    menu = {i.category: i.names for i in Categories.query}
-    describe_dish = {i.dish_code: [i.name_ua, i.describe, i.image_link, i.likes] for i in Dishes.query}
-    num_category = len(menu)
+    price = Price.query.first().price
+    menu = {i.category: i.names for i in Category.query}
+    dish_attributes = {i.dish_code: [i.name_ua, i.describe, i.image_link, i.likes] for i in Dish.query}
+    categories_number = len(menu)
     context = {
         'table_numbers': table_numbers,
-        'addit': addit,
         'menu_add': menu_add,
         'menu_add_ua': menu_add_ua,
+        'category_icons': category_icons,
         'menu': menu,
-        'describe_dish': describe_dish,
+        'dish_attributes': dish_attributes,
         'price': price,
-        'num_category': num_category
+        'categories_number': categories_number
     }
     return context

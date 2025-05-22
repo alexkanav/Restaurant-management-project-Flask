@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+
+{% block top_menu %}
+    <div class='header'>
+
+        {{ super() }}
+
+        {% include "links.html" %}
+
+        <div class="top-nav-menu">
+            <a class="menu-link" href="/"><img class="logo-menu" src="{{ url_for('static', filename='images/home.svg') }}">На головну</a>
+            <a class="menu-link" href="{{ url_for('users.choice_of_dishes') }}"><img class="logo-menu" src="{{ url_for('static', filename='images/hot.svg') }}">Меню</a>
+        </div>
+
+    </div>
+{% endblock %}
+
+
+{% block content %}
+    <div class="container">
+        <div class="success-message">Дякуємо. Ваше замовлення прийнято і буде готове через - 20 хвилин.</div>
+        <div class="text-block">(Час виконання замовлення розраховується автоматично відповідно до вибраних вами страв)</div>
+        <hr>
+        <p class="comment"> Залиште, будь ласка, свій відгук, що сподобалося і що нам слід виправити.</p>
+
+        <form method="post">
+            {{ form.hidden_tag() }}
+            <div class="mb-3">
+                {{ form.comm_name.label(class="form-label") }}
+                {{ form.comm_name(class="form-control") }}
+                    {% for error in form.comm_name.errors %}
+                        <span style="color:red;">{{ error }}</span>
+                    {% endfor %}
+            </div>
+            <div class="mb-3">
+                {{ form.comm_text.label(class="form-label") }}
+                {{ form.comm_text(class="form-control auto-resize") }}
+                    {% for error in form.comm_text.errors %}
+                        <span style="color:red;">{{ error }}</span>
+                    {% endfor %}
+            </div>
+
+            <p>{{ form.submit() }}</p>
+        </form>
+
+    </div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+
+{% block extra_css_js %}
+    <script src="{{ url_for('static', filename='js/like.js') }}" defer></script>
+{% endblock %}
+
+
+{% block content %}
+    <img class="descr-image" src='/{{image_path}}'>
+        <div class="white-like">
+            <button id="like_button" data-name={{id}}>
+                <img class="white-like-icon" src= "{{ url_for('static', filename='images/likeW.jpg') }}">  {{likes}} переглядів: {{views}}
+            </button>
+        </div>
+        <div class="black-like">
+            <img class="black-like-icon" src= "{{ url_for('static', filename='images/likeB.jpg') }}"> {{likes+1}} переглядів: {{views}}
+        </div>
+
+        <div class="dish-description">
+            {{describe}}
+        </div>
+    <button id="close_button" class="closer"><img class="exit-icon" src= "{{ url_for('static', filename='images/exit.png') }}">
+    </button>
+{% endblock %}
+
+
+{% block footer %}
+    <button id="to_order_button" class="closer">Повернутись</button>
+{% endblock %}

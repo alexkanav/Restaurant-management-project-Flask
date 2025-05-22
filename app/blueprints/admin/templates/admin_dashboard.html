@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+
+{% block top_menu %}
+    <div class='header'>
+
+        {{ super() }}
+
+        <div class="top-nav-menu">
+        <a class="menu-link" href="{{ url_for('admin.order_processing') }}">Замовлення</a>
+        <a class="menu-link" href="{{ url_for('admin.login') }}">Увійти</a>
+        <a class="menu-link" href="{{ url_for('admin.register') }}">Реєстрація</a>
+        <a class="menu-link" href="{{ url_for('admin.logout') }}">Вийти</a>
+    </div>
+
+    </div>
+{% endblock %}
+
+
+{% block content %}
+    <p style="margin-left: 20px;">Користувач: {{name}}</p>
+{% endblock %}

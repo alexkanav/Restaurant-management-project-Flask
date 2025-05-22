@@ -1,150 +1,110 @@
 {% extends 'base.html' %}
+
+{% block extra_css_js %}
+    <script>
+        const menuAdd = {{ menu_add | tojson }};
+        const menuAddUa = {{ menu_add_ua | tojson }};
+        const price = {{ price | tojson }};
+        const dishAttributes = {{ dish_attributes | tojson }};
+        const categoriesNum = {{ categories_number }};
+    </script>
+
+    <script src="{{ url_for('static', filename='js/scroll_menu.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/dragscroll.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/order.js') }}" defer></script>
+{% endblock %}
+
+
 {% block top_menu %}
+    <div class="header">
 
-<span class="menu-top-icon">
-    <a href="/"><img class='logo_menu_top' src="/static/images/home.svg"></a>
-</span>
+        {{ super() }}
 
-<div class="menu-top">
-    {% for category in menu%}
-        {% if category == 'Популярне' %}
-    <a class='menu2' href="#category{{loop.index}}"><img class='logo_menu' src="/static/images/heart.svg">Популярне</a>
-        {% elif category == 'Рекомендуємо' %}
-    <a class='menu2' href="#category{{loop.index}}"><img class='logo_menu' src="/static/images/star.svg">Рекомендуємо</a>
-        {% endif %}
-    {% endfor %}
-</div>
+        <span class="top-menu-icon">
+            <a href="/"><img class="top-menu-logo" src= "{{ url_for('static', filename='images/home.svg') }}"></a>
+        </span>
 
-{% endblock %}
-{% block top_1 %}
+        <div class="top-nav-menu">
 
-<div class="popup__bg">
-    <div class="popup">
-        <h4>Ваш столик <span id="ftable_number"></span></h4>
-        <p></p>
-        <hr>
-        <div style="font-style: italic;">
-            <span id="fdish"></span>
+            {% for category in menu %}
+                {% if category in category_icons %}
+
+                    <a class="menu-link" href="#category{{ loop.index }}">
+                        <img loading="lazy" class="logo-menu" src="{{ url_for('static', filename='images/' ~ category_icons[category]) }}">
+                        {{ category }}
+                    </a>
+
+                {% endif %}
+            {% endfor %}
+
         </div>
-            <p></p>
-            <p></p>
+
+    </div>
+{% endblock %}
+
+
+{% block content %}
+    <div class="popup__bg">
+        <div class="popup">
+            <h4>Ваш столик <span id="display_table_number"></span></h4>
             <hr>
-            <h3>Ваше замовлення на суму: <span id="final_sum"></span> грн.</h3>
-            <p></p>
-            <p></p>
-            <p></p>
-            <button id="cancel_order" onclick="cancelOrder()">Скасувати</button>
-            <button id="confirm_order" onclick="sendOrder()">Підтверджую</button>
+                <span id="display_dish"></span>
+            <hr>
+                <h3>Ваше замовлення на суму: <span id="final_sum"></span> грн.</h3>
+                <button id="cancel_order">Скасувати</button>
+                <button id="confirm_order">Підтверджую</button>
         </div>
-</div>
-
-<div id="block_table">
-    <h3>Виберіть номер вашого столика</h3>
-        {% for i in range(1, table_numbers+1) %}
-    <span class="table_button">
-        <button onclick="choiceOfTable('{{i}}', {{describe_dish}}, {{price}}, {{menu_add}}, {{menu_add_ua}})"
-            type="button" class="table_btn">{{i}}
-        </button>
-    </span>
-    {%endfor%}
-</div>
-
-<div id="block_choice_dish">
-    <div class="nav-scroller">
-        <nav class="nav-scroller__items dragscroll">
-            {% for category in menu%}
-            <a class="nav-scr ba1" id='pos{{ loop.index }}'
-               href="#category{{loop.index}}">{{category}}</a>
-            {% endfor %}
-        </nav>
     </div>
+
+    <div class="block-table">
+        <h3>Виберіть номер вашого столика</h3>
+
+            {% for i in range(1, table_numbers+1) %}
+                <span class="table-button">
+                    <button class="table-btn" data-table="{{ i }}">{{ i }}</button>
+                </span>
+            {%endfor%}
+    </div>
+
+    <div class="block-choice-dish">
+        <div class="nav-scroller">
+            <nav class="nav-scroller__items dragscroll">
+
+                {% for category in menu%}
+                    <a class="nav-scr" id="pos{{ loop.index }}" href="#category{{ loop.index }}">{{ category }}</a>
+                {% endfor %}
+
+            </nav>
+        </div>
+
         {% for category in menu %}
-    <div id='category{{loop.index}}'>
-        <div class="bl_name"> {{category}}</div>
+            <div id="category{{ loop.index }}">
+                <div class="category-block"> {{ category }}</div>
 
-            {% for code in menu[category] %}
-                {% if code in menu['Популярне'] %}
-                    {% set add_pop = "pop" %}
-                {% endif %}
+                {% for code in menu[category] %}
 
-                {% if code in menu['Рекомендуємо'] %}
-                    {% set add_rec = "rec" %}
-                {% endif %}
+                    {% set flags = {
+                        'is_popular': code in menu['Популярне'],
+                        'is_recommended': code in menu['Рекомендуємо'],
+                        'category_id': 'pop' if category == 'Популярне' else 'rec' if category == 'Рекомендуємо' else ''
+                    } %}
 
-                {% if category == 'Популярне' %}
-                     {% set add_id = "pop" %}
-                 {% elif category == 'Рекомендуємо' %}
-                     {% set add_id = "rec" %}
-                {% endif %}
+                    {% include "dish_card.html" %}
 
-                {% include "dish_card.html" %}
-            {% endfor %}
-    </div>
+                {% endfor %}
+
+            </div>
         {% endfor %}
 
-
-
-<script>
-
-const navItems = document.querySelector('.nav-scroller__items');
-    {% for j in range(1, num_category+1) %}
-        const butt{{j}} = document.querySelector("#pos{{j}}");
-        const bodyElement{{j}} = document.querySelector("#category{{j}}");
-        const containerRect{{j}} = bodyElement{{j}}.getBoundingClientRect();
-        const navItemB{{j}}Rect = butt{{j}}.getBoundingClientRect().left;
-    {% endfor %}
-
-function changeCss() {
-    const sections = [
-        {% for i in range(1, num_category+1) %}
-            { rect: containerRect{{i}}, button: butt{{i}}, nav: navItemB{{i}}Rect },
-        {% endfor %}
-    ];
-
-    const scrollY = this.scrollY;
-
-    for (const { rect, button, nav } of sections) {
-        if (scrollY > rect.top - 10 && scrollY < rect.bottom) {
-              scrNav(nav);
-              sections.forEach(({ button: btn }) => btn.classList.remove("butcol"));
-              button.classList.add("butcol");
-              break;
-        }
-    }
-};
-
-window.addEventListener("scroll", changeCss , false);
-
-function scrNav(ba) {
-    navItems.scrollLeft = ba - 200;
-};
-
-
-let popupBg = document.querySelector('.popup__bg');
-let popup = document.querySelector('.popup');
-let openPopupButtons = document.querySelectorAll('.show_final_order');
-let hideAccordion = document.querySelector('.accordion');
-
-openPopupButtons.forEach((button) => {
-    button.addEventListener('click', (e) => {
-        e.preventDefault();
-        popupBg.classList.add('active');
-        popup.classList.add('active');
-        hideAccordion.classList.add('hide');
-   })
-});
-
-</script>
-
-    <div id="footer">
-        <p>
-            <button id="add-order1111" onclick="choiceTable()">Завершити замовлення</button>
-        </p>
-
     </div>
-</div>
-
 {% endblock %}
+
+
+{% block footer %}
+    <button id="add_order">Завершити замовлення</button>
+{% endblock %}
+
+
 
 
 

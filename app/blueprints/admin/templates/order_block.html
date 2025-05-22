@@ -1,0 +1,21 @@
+{% for item in items %}
+    <button class="order-card" data-order-id="{{ item[0] }}">
+        <div class="order-card-body">
+            <div class="order-card-title">
+                <span>{{ item[0] }}</span>
+                <span class="table-num">Стіл  {{ item[1] }}</span>
+            </div>
+
+            <div class="order-card-description">
+
+                {% for dish_id, quantity in item[2].items() %}
+
+                    {{ dish[dish_id] }}: {{ quantity }},
+
+                {% endfor %}
+
+            </div>
+            <div class="order-card-price">{{ item[3] }} грн.</div>
+        </div>
+    </button>
+{% endfor %}
