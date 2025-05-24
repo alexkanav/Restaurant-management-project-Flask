@@ -1,43 +1,47 @@
-This project is a full-featured restaurant ordering system built using the Flask web framework.
+# Restaurant Ordering System (Flask)
 
-It includes:
+This project is a full-featured restaurant ordering system built using the **Flask** web framework.
 
-- A dynamic menu system where dishes can be created, updated, and displayed
-- A customer-facing interface to place new orders
-- An admin/staff dashboard to process and complete orders
-- Status tracking (e.g., New → In Progress → Completed)
-- Form handling using Flask-WTF
-- User sessions and authentication via Flask-Login
-- Performance optimization with Flask-Caching
-- Persistent storage using Flask-SQLAlchemy
+---
+## Features
+
+- Dynamic menu system where dishes can be created, updated, and displayed
+- Customer-facing interface to place new orders
+- Admin/staff dashboard to process and complete orders
+- Order status tracking (e.g., New → In Progress → Completed)
+- Form handling using **Flask-WTF**
+- User sessions and authentication via **Flask-Login**
+- Performance optimization with **Flask-Caching**
+- Persistent storage using **Flask-SQLAlchemy**
 - Uses **SQLite** by default (easy for local development)
 - Supports **PostgreSQL**, **MySQL**, or other databases via SQLAlchemy
+- Modular app structure with Blueprints (main, auth)
+- CSRF protection & environment variable config support
 
-It’s ideal for small restaurants, cafes, or educational use cases to demonstrate real-world Flask application structure with Blueprints and modular design.
+Ideal for small restaurants, cafes, or educational purposes demonstrating a real-world Flask app structure.
 
+---
+## Installation
 
-Features:
-- Modular app with Blueprints (main, auth)
-- User authentication with Flask-Login
-- Database ORM with Flask-SQLAlchemy
-- CSRF protection & forms with Flask-WTF
-- Caching support via Flask-Caching
-- Environment variable config support
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/alexkanav/Restaurant-management-project-Flask.git
+   cd Restaurant-management-project-Flask
 
+2. Create and activate a virtual environment:
+    ```bash
+    python -m venv venv
+    source venv/bin/activate
 
- Installation:
-1. Clone the repository
-git clone https://github.com/alexkanav/Restaurant-management-project-Flask
+3. Install dependencies:
+    ```bash
+    pip install -r requirements.txt
 
-2. Create and activate a virtual environment
+---
+## Running the App
+Note: For production deployments, do not use Flask’s built-in development server (flask run).
+Instead, deploy Flask behind a production-grade WSGI server (e.g., Gunicorn) combined with a reverse proxy like Nginx.
 
-3. Install dependencies
-pip install -r requirements.txt
-
-Running the App:
-- For production deployments, you shouldn't use Flask’s built-in development server (flask run). Instead, you should run Flask behind a production-grade WSGI server, often combined with a reverse proxy like Nginx.
-
-
-License:
+---
+## License
 This project is licensed under the MIT License.
-
