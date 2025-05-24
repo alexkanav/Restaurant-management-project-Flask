@@ -16,16 +16,16 @@ It includes:
 It’s ideal for small restaurants, cafes, or educational use cases to demonstrate real-world Flask application structure with Blueprints and modular design.
 
 
-Features
-Modular app with Blueprints (main, auth)
-User authentication with Flask-Login
-Database ORM with Flask-SQLAlchemy
-CSRF protection & forms with Flask-WTF
-Caching support via Flask-Caching
-Environment variable config support
+Features:
+- Modular app with Blueprints (main, auth)
+- User authentication with Flask-Login
+- Database ORM with Flask-SQLAlchemy
+- CSRF protection & forms with Flask-WTF
+- Caching support via Flask-Caching
+- Environment variable config support
 
 
- Installation
+ Installation:
 1. Clone the repository
 git clone https://github.com/alexkanav/Restaurant-management-project-Flask
 
@@ -34,10 +34,10 @@ git clone https://github.com/alexkanav/Restaurant-management-project-Flask
 3. Install dependencies
 pip install -r requirements.txt
 
-Running the App
-For production deployments, you shouldn't use Flask’s built-in development server (flask run). Instead, you should run Flask behind a production-grade WSGI server, often combined with a reverse proxy like Nginx.
+Running the App:
+- For production deployments, you shouldn't use Flask’s built-in development server (flask run). Instead, you should run Flask behind a production-grade WSGI server, often combined with a reverse proxy like Nginx.
 
 
-License
+License:
 This project is licensed under the MIT License.
 
