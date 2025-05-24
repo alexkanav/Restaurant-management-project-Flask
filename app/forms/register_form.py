@@ -4,11 +4,11 @@ from wtforms.validators import DataRequired, Email, Length, EqualTo
 
 
 class RegisterForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
+    username = StringField("Ім'я", validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email(message="Некоректна поштова скринька.")])
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
+    password = PasswordField("Пароль", validators=[DataRequired(), Length(min=6)])
     confirm_password = PasswordField(
-        'Confirm Password',
+        "Підтвердіть пароль",
         validators=[
             DataRequired(),
             EqualTo('password', message="Паролі не збігаються!")

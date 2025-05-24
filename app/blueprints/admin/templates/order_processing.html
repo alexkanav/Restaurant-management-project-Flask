@@ -1,8 +1,10 @@
 {% extends "base.html" %}
 
+
 {% block extra_css_js %}
     <script src="{{ url_for('static', filename='js/update_orders.js') }}" defer></script>
 {% endblock %}
+
 
 {% block top_menu %}
     <div class='header'>
@@ -19,7 +21,7 @@
 
 
 {% block content %}
-    <p style="margin-left: 20px;">Користувач: {{name}}</p>
+    <p style="margin-left: 20px;font-style: italic;">Користувач: {{name}}</p>
     <div id="response" class="error">{{message}}</div>
     <div id="order_content" class="orders-container"></div>
 {% endblock %}

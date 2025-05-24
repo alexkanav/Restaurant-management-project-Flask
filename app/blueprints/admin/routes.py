@@ -86,8 +86,9 @@ def checking_new_order():
 def update_orders():
     try:
         uncompleted_orders = Order.query.filter_by(completed='No').all()
+        order_count = len(uncompleted_orders)
         new_orders = [order.to_dict() for order in uncompleted_orders]
-        return render_template('order_block.html', items=new_orders)
+        return render_template('order_block.html', order_count=order_count, items=new_orders)
 
     except Exception as e:
         logger.error("order update error: %s", e, exc_info=True)

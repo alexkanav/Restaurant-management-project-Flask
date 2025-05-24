@@ -32,6 +32,11 @@ const checkOrders = async () => {
 document.getElementById('order_content').addEventListener('click', async (event) => {
     const card = event.target.closest('.order-card');
     if (card) {
+        const userConfirmed = confirm('Бажаєте закрити замовлення?');
+        if (!userConfirmed) {
+            return; // User clicked "No" (Cancel)
+        }
+
         const orderId = card.getAttribute('data-order-id');
         const data = { order_id: orderId };
         try {

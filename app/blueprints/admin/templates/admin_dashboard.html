@@ -9,7 +9,6 @@
         <div class="top-nav-menu">
         <a class="menu-link" href="{{ url_for('admin.order_processing') }}">Замовлення</a>
         <a class="menu-link" href="{{ url_for('admin.login') }}">Увійти</a>
-        <a class="menu-link" href="{{ url_for('admin.register') }}">Реєстрація</a>
         <a class="menu-link" href="{{ url_for('admin.logout') }}">Вийти</a>
     </div>
 
@@ -18,5 +17,5 @@
 
 
 {% block content %}
-    <p style="margin-left: 20px;">Користувач: {{name}}</p>
+    <p style="margin-left: 20px; font-style: italic;">Користувач: {{name}}</p>
 {% endblock %}
