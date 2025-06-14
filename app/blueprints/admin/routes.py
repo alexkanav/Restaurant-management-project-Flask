@@ -20,12 +20,14 @@ def load_user(user_id):
 
 @admin_bp.route('/')
 def admin_dashboard():
+    title = "Управління"
     name = current_user.username if current_user.is_authenticated else "Вхід не виконано!!!"
-    return render_template('admin_dashboard.html', name=name)
+    return render_template('admin_dashboard.html', title=title, name=name)
 
 
 @admin_bp.route('/login', methods=['GET', 'POST'])
 def login():
+    title = "Ауторизація"
     form = LoginForm()
     if form.validate_on_submit():
         user = Staff.query.filter(Staff.email == form.email.data).first()
@@ -33,12 +35,13 @@ def login():
         if user and user.check_password(form.password.data):
             login_user(user, remember=True)
             next_page = request.args.get('next')
+            flash('Авторизація успішна!', 'success')
             return redirect(next_page or url_for('admin.admin_dashboard'))
         else:
-            flash('Не збігається логін-пароль. Спробуйте ще раз.')
+            flash('Не збігається логін-пароль. Спробуйте ще раз.', 'danger')
             return redirect(url_for('admin.login'))
 
-    return render_template('login.html', form=form)
+    return render_template('login.html', title=title, form=form)
 
 
 @admin_bp.route('/logout')
@@ -52,26 +55,27 @@ def logout():
 
 @admin_bp.route('/register', methods=['GET', 'POST'])
 def register():
+    title = "Реєстрація"
     form = RegisterForm()
     if form.validate_on_submit():
 
         if Staff.query.filter(Staff.email == form.email.data).first():
-            flash("Ваша Email вже зареєстрована.")
+            flash('Ваша Email вже зареєстрована.', 'danger')
             return redirect(url_for('admin.register'))
 
         if Staff.add_user(form.username.data, form.email.data, form.password.data):
-            flash('Ви успішно зареєстровані, увійдіть до системи.')
+            flash('Ви успішно зареєстровані, увійдіть до системи.', 'success')
             return redirect(url_for('admin.login'))
         else:
-            flash("При реєстрації виникла помилка.")
-
-    return render_template('register.html', form=form)
+            flash('При реєстрації виникла помилка.', 'danger')
+    return render_template('register.html', title=title, form=form)
 
 
 @admin_bp.route('/order-processing')
 @login_required
 def order_processing():
-    return render_template('order_processing.html', name=current_user.username)
+    title = "Замовлення"
+    return render_template('order_processing.html', title=title, name=current_user.username)
 
 
 @admin_bp.route('/checking-new-orders')
@@ -84,6 +88,7 @@ def checking_new_order():
 @admin_bp.route('/update-orders')
 @login_required
 def update_orders():
+    title = "Замовлення"
     try:
         uncompleted_orders = Order.query.filter_by(completed='No').all()
         order_count = len(uncompleted_orders)
