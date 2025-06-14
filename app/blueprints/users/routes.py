@@ -120,6 +120,7 @@ def post_order_like():
 
 @users_bp.route("/upload-comment", methods=['GET', 'POST'])
 def upload_comment():
+    title = "Коментарі"
     form = CommentForm()
     if form.validate_on_submit():
         user_id_raw = request.cookies.get('user_id')
@@ -132,7 +133,7 @@ def upload_comment():
         flash("Дякуємо за ваш комент! Він з'явиться після модерації.", "success")
         return render_template("gratitude.html")
 
-    return render_template("upload_comment.html", form=form)
+    return render_template("upload_comment.html", title=title, form=form)
 
 
 @users_bp.route('/faulty')
